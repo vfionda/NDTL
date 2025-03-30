@@ -1,0 +1,62 @@
+start: ndtl_formula
+
+?ndtl_formula:            ndtl_equivalence
+?ndtl_equivalence:        ndtl_implication (EQUIVALENCE ndtl_implication)*
+?ndtl_implication:        ndtl_or (IMPLY ndtl_or)*
+?ndtl_or:                 ndtl_and (OR ndtl_and)*
+?ndtl_and:                ndtl_unaryop (AND ndtl_unaryop)*
+
+?ndtl_unaryop:     ndtl_always
+             |     ndtl_eventually
+             |     ndtl_next
+             |     ndtl_not
+             |     ndtl_wrapped
+
+?ndtl_always:      ALWAYS NUMBER? ndtl_unaryop
+?ndtl_eventually:  EVENTUALLY NUMBER? ndtl_unaryop
+?ndtl_next:        NEXT NUMBER? ndtl_unaryop
+?ndtl_not:         NOT ndtl_unaryop
+?ndtl_wrapped:     ndtl_atom
+             |     LSEPARATOR ndtl_formula RSEPARATOR
+
+ndtl_atom: node | aggregate_formula
+
+node: POST | TWEET | RETWEET
+
+?aggregate_formula: aggregate (arithmetic_expression)? (COMPARATOR NUMBER | EQUIVALENCE "(" NUMBER "," NUMBER ")")
+?arithmetic_expression:  PLUS aggregate | MINUS aggregate
+
+?aggregate: typ attribute "(" "Gamma" "(" node "," value ")" ")"
+
+?typ: AVG | MAX | MIN 
+?attribute: DELTA | SIGMA | TIME
+?value: NUMBER | INF
+
+
+ALWAYS.2: /G(?=[^a-zA-Z]|$)/
+EVENTUALLY.2: /F(?=[^a-zA-Z]|$)/
+NEXT.2: /X(?=[^a-zA-Z]|$)/
+NOT: "!" | "~"
+OR: "|" | "||"
+AND: "&" | "&&"
+EQUIVALENCE: "=" | "<->" | "<=>"
+IMPLY: "->" | "=>"
+LSEPARATOR: "("
+RSEPARATOR: ")"
+POST: "Root"
+TWEET: "Tweet"
+RETWEET: "Retweet"
+COMPARATOR: "<=" | ">=" | "<" | ">"
+PLUS: "+"
+MINUS: "-"
+AVG: "avg"
+MIN: "min"
+MAX: "max"
+DELTA: "delta"
+SIGMA: "sigma"
+TIME: "t"
+INF: "inf"
+
+%import common.NUMBER         // Matches numbers
+%import common.WS
+%ignore WS 
